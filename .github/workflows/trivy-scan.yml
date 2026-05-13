@@ -174,7 +174,7 @@ jobs:
 
           jq -s '{
             "SchemaVersion": 2,
-            "ArtifactName": "healthcare-portal",
+            "ArtifactName": "${{ github.repository }}",
             "GeneratedAt": now | todate,
             "Results": [ .[] | .Results // [] | .[] ]
           }' $FILES > trivy-results.json
