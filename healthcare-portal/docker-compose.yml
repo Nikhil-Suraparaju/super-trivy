@@ -1,0 +1,37 @@
+version: '3.7'
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - JWT_SECRET=super-secret-jwt-key-healthcare-2023
+      - MONGO_URI=mongodb://admin:P@ssw0rd123!@mongo:27017/healthcaredb
+      - AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
+      - AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    # Intentionally no resource limits
+    depends_on:
+      - mongo
+    # Intentionally privileged mode
+    privileged: true
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  mongo:
+    # Intentionally outdated MongoDB image
+    image: mongo:4.0
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=P@ssw0rd123!
+    # No resource limits intentionally
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

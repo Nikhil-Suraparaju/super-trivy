@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: healthcare-portal
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: healthcare-portal
+  template:
+    metadata:
+      labels:
+        app: healthcare-portal
+    spec:
+      # Intentionally no securityContext at pod level
+      containers:
+        - name: healthcare-portal
+          image: healthcare-portal:latest
+          ports:
+            - containerPort: 3000
+          # Intentionally privileged container
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            allowPrivilegeEscalation: true
+            readOnlyRootFilesystem: false
+          # Intentionally no resource limits
+          env:
+            - name: JWT_SECRET
+              value: "super-secret-jwt-key-healthcare-2023"
+            - name: MONGO_URI
+              value: "mongodb://admin:P@ssw0rd123!@mongo-service:27017/healthcaredb"
+            - name: AWS_ACCESS_KEY_ID
+              value: "AKIAIOSFODNN7EXAMPLE"
+            - name: AWS_SECRET_ACCESS_KEY
+              value: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+          # No liveness/readiness probes intentionally
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: healthcare-portal-service
+spec:
+  # Intentionally using NodePort with wide exposure
+  type: NodePort
+  selector:
+    app: healthcare-portal
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30000
